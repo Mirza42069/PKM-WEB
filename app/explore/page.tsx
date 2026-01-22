@@ -1,3 +1,7 @@
+"use client"
+
+import * as React from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +15,7 @@ const listings = [
     operator: "Blue Ocean Tours",
     location: "Raja Ampat, Papua Barat",
     category: "Conservation Diving",
+    categoryValue: "diving",
     price: 2500000,
     rating: 4.9,
     reviews: 128,
@@ -24,6 +29,7 @@ const listings = [
     operator: "Marine Green Divers",
     location: "Bunaken, Sulawesi Utara",
     category: "Coral Watching",
+    categoryValue: "coral-watching",
     price: 450000,
     rating: 4.8,
     reviews: 89,
@@ -37,6 +43,7 @@ const listings = [
     operator: "Komodo Eco Adventures",
     location: "Labuan Bajo, NTT",
     category: "Wildlife Experience",
+    categoryValue: "wildlife",
     price: 1800000,
     rating: 4.9,
     reviews: 256,
@@ -50,6 +57,7 @@ const listings = [
     operator: "Wakatobi Green Travel",
     location: "Wakatobi, Sulawesi Tenggara",
     category: "Eco-Touring",
+    categoryValue: "eco-touring",
     price: 1200000,
     rating: 4.7,
     reviews: 67,
@@ -63,6 +71,7 @@ const listings = [
     operator: "Derawan Conservation",
     location: "Derawan, Kalimantan Timur",
     category: "Wildlife Experience",
+    categoryValue: "wildlife",
     price: 650000,
     rating: 4.8,
     reviews: 142,
@@ -76,6 +85,7 @@ const listings = [
     operator: "Gili Eco Trust",
     location: "Gili Trawangan, NTB",
     category: "Conservation Diving",
+    categoryValue: "diving",
     price: 800000,
     rating: 4.6,
     reviews: 98,
@@ -102,6 +112,29 @@ function formatPrice(price: number) {
 }
 
 export default function ExplorePage() {
+  const [activeCategory, setActiveCategory] = React.useState("all")
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [selectedListing, setSelectedListing] = React.useState<number | null>(null)
+
+  // Filter listings based on category and search query
+  const filteredListings = listings.filter((listing) => {
+    const matchesCategory = activeCategory === "all" || listing.categoryValue === activeCategory
+    const matchesSearch = searchQuery === "" || 
+      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.operator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listing.location.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
+
+  function handleDetailClick(listingId: number) {
+    setSelectedListing(listingId)
+    // Mockup: Just show an alert for now
+    const listing = listings.find(l => l.id === listingId)
+    if (listing) {
+      alert(`Detail untuk: ${listing.title}\n\nIni adalah mockup. Halaman detail akan segera hadir!`)
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -125,13 +158,16 @@ export default function ExplorePage() {
               <Input 
                 placeholder="Cari destinasi atau operator..." 
                 className="max-w-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <div className="flex gap-2 flex-wrap">
-                {categories.map((cat, i) => (
+                {categories.map((cat) => (
                   <Button
                     key={cat.value}
-                    variant={i === 0 ? "default" : "outline"}
+                    variant={activeCategory === cat.value ? "default" : "outline"}
                     size="sm"
+                    onClick={() => setActiveCategory(cat.value)}
                   >
                     {cat.name}
                   </Button>
@@ -145,76 +181,104 @@ export default function ExplorePage() {
         <section className="py-10">
           <div className="container mx-auto px-4">
             <p className="text-xs text-muted-foreground mb-6">
-              Menampilkan <span className="font-medium text-foreground">{listings.length}</span> hasil
+              Menampilkan <span className="font-medium text-foreground">{filteredListings.length}</span> hasil
+              {activeCategory !== "all" && (
+                <span> untuk kategori <span className="font-medium text-foreground">{categories.find(c => c.value === activeCategory)?.name}</span></span>
+              )}
+              {searchQuery && (
+                <span> dengan pencarian "<span className="font-medium text-foreground">{searchQuery}</span>"</span>
+              )}
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {listings.map((listing) => (
-                <Card key={listing.id} className="group flex flex-col">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="text-xs text-muted-foreground font-mono">
-                        #{String(listing.id).padStart(2, "0")}
-                      </span>
-                      {listing.certified && (
-                        <Badge variant="secondary" className="text-xs">
-                          Tersertifikasi
-                        </Badge>
-                      )}
-                    </div>
-                    <CardTitle className="text-sm font-semibold leading-snug">
-                      {listing.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {listing.operator}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="pb-3 flex-1">
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="flex justify-between">
-                        <span>Lokasi</span>
-                        <span className="text-foreground">{listing.location}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Durasi</span>
-                        <span className="text-foreground">{listing.duration}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Rating</span>
-                        <span className="text-foreground">{listing.rating} ({listing.reviews})</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Kategori</span>
-                        <span className="text-foreground">{listing.category}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Carbon Calculator Display */}
-                    <div className="mt-4 pt-3 border-t">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Estimasi Karbon</span>
-                        <span className="text-xs font-mono text-secondary font-medium">
-                          ~{listing.carbonKg} kg CO2
+            {filteredListings.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Tidak ada destinasi yang cocok dengan filter Anda.
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setActiveCategory("all")
+                    setSearchQuery("")
+                  }}
+                >
+                  Reset Filter
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredListings.map((listing) => (
+                  <Card key={listing.id} className="group flex flex-col">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-xs text-muted-foreground font-mono">
+                          #{String(listing.id).padStart(2, "0")}
                         </span>
+                        {listing.certified && (
+                          <Badge variant="secondary" className="text-xs">
+                            Tersertifikasi
+                          </Badge>
+                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="flex items-center justify-between pt-3 border-t mt-auto">
-                    <div>
-                      <p className="text-sm font-semibold text-primary">
-                        {formatPrice(listing.price)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">per orang</p>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      Detail
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+                      <CardTitle className="text-sm font-semibold leading-snug">
+                        {listing.title}
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        {listing.operator}
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="pb-3 flex-1">
+                      <div className="space-y-2 text-xs text-muted-foreground">
+                        <div className="flex justify-between">
+                          <span>Lokasi</span>
+                          <span className="text-foreground">{listing.location}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Durasi</span>
+                          <span className="text-foreground">{listing.duration}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Rating</span>
+                          <span className="text-foreground">{listing.rating} ({listing.reviews})</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Kategori</span>
+                          <span className="text-foreground">{listing.category}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Carbon Calculator Display */}
+                      <div className="mt-4 pt-3 border-t">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Estimasi Karbon</span>
+                          <span className="text-xs font-mono text-secondary font-medium">
+                            ~{listing.carbonKg} kg CO2
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    
+                    <CardFooter className="flex items-center justify-between pt-3 border-t mt-auto">
+                      <div>
+                        <p className="text-sm font-semibold text-primary">
+                          {formatPrice(listing.price)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">per orang</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleDetailClick(listing.id)}
+                      >
+                        Detail
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>

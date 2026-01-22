@@ -2,21 +2,54 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
+
+import { cn } from "@/lib/utils"
 
 function Navbar() {
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
+
   return (
-    <header data-slot="navbar" className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header 
+      data-slot="navbar" 
+      className={cn(
+        "w-full z-50",
+        isHomePage 
+          ? "absolute top-0 left-0 right-0 bg-transparent border-b border-white/10" 
+          : "sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      )}
+    >
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.png" alt="Marleen" width={28} height={28} />
-          <span className="text-sm font-semibold tracking-tight">Marleen</span>
+          <span className={cn(
+            "text-sm font-semibold tracking-tight",
+            isHomePage && "text-white"
+          )}>Marleen</span>
         </Link>
         
         <nav className="flex items-center gap-8">
-          <Link href="/" className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link 
+            href="/" 
+            className={cn(
+              "text-xs font-medium transition-colors",
+              isHomePage 
+                ? "text-white/70 hover:text-white" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
             Beranda
           </Link>
-          <Link href="/explore" className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link 
+            href="/explore" 
+            className={cn(
+              "text-xs font-medium transition-colors",
+              isHomePage 
+                ? "text-white/70 hover:text-white" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
             Jelajahi
           </Link>
         </nav>
