@@ -23,17 +23,11 @@ export default function HomePage() {
           {/* Hero Content */}
           <div className="relative z-10 container mx-auto px-4 pt-16 pb-8 flex-1 flex items-center">
             <div className="max-w-xl">
-              <p className="text-xs text-white/70 mb-3 tracking-wide uppercase">
-                Platform Ekowisata Bahari
-              </p>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
-                Wisata Bahari
-                <br />
-                Berkelanjutan
+                Marleen
               </h1>
               <p className="text-sm text-white/80 mb-8 max-w-md leading-relaxed">
-                Jelajahi keindahan laut Indonesia sambil berkontribusi pada konservasi. 
-                Setiap perjalanan membantu melindungi ekosistem laut.
+                Sustainable marine tourism platform.
               </p>
               <Link href="/explore">
                 <Button size="lg">Jelajahi Destinasi</Button>
