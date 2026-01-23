@@ -18,45 +18,65 @@ export default function HomePage() {
             priority
           />
           {/* Overlay gradient - darker at bottom for features readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/80" />
           
-          {/* Hero Content */}
-          <div className="relative z-10 container mx-auto px-4 pt-16 pb-8 flex-1 flex items-center">
-            <div className="max-w-xl">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
+          {/* Hero Content - Centered */}
+          <div className="relative z-10 container mx-auto px-4 flex-1 flex flex-col items-center justify-center text-center">
+            <div className="max-w-3xl">
+              {/* Main Headline */}
+              <h1 
+                className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-white"
+                style={{ letterSpacing: "0.02em" }}
+              >
                 Marleen
               </h1>
-              <p className="text-sm text-white/80 mb-8 max-w-md leading-relaxed">
-                Sustainable marine tourism platform.
+              
+              {/* Tagline */}
+              <p className="text-base md:text-lg text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
+                Sustainable marine tourism platform. Discover Indonesia&apos;s ocean wonders while supporting conservation.
               </p>
-              <Link href="/explore">
-                <Button size="lg">Jelajahi Destinasi</Button>
-              </Link>
+              
+              {/* CTA Button */}
+              <div>
+                <Link href="/explore">
+                  <Button 
+                    size="lg" 
+                    className="text-sm px-8 py-6 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                  >
+                    Jelajahi Destinasi
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
 
-          {/* Features Section - Merged with Hero */}
+          {/* Features Section - Glass Cards */}
           <div className="relative z-10 mt-auto">
-            <div className="container mx-auto px-4 py-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                  <p className="text-xs text-white/50 font-mono mb-2">[01]</p>
+            <div className="container mx-auto px-4 py-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Feature 1 */}
+                <div className="glass glass-hover rounded-xl p-6 transition-colors duration-300">
+                  <p className="text-xs text-white/40 font-mono mb-3">[01]</p>
                   <h3 className="text-sm font-semibold mb-2 text-white">Carbon Calculator</h3>
-                  <p className="text-xs text-white/70 leading-relaxed">
+                  <p className="text-xs text-white/60 leading-relaxed">
                     Setiap paket wisata menampilkan estimasi jejak karbon perjalanan Anda.
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-white/50 font-mono mb-2">[02]</p>
+                
+                {/* Feature 2 */}
+                <div className="glass glass-hover rounded-xl p-6 transition-colors duration-300">
+                  <p className="text-xs text-white/40 font-mono mb-3">[02]</p>
                   <h3 className="text-sm font-semibold mb-2 text-white">Operator Tersertifikasi</h3>
-                  <p className="text-xs text-white/70 leading-relaxed">
+                  <p className="text-xs text-white/60 leading-relaxed">
                     Hanya operator dengan sertifikasi ramah lingkungan yang terdaftar.
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-white/50 font-mono mb-2">[03]</p>
+                
+                {/* Feature 3 */}
+                <div className="glass glass-hover rounded-xl p-6 transition-colors duration-300">
+                  <p className="text-xs text-white/40 font-mono mb-3">[03]</p>
                   <h3 className="text-sm font-semibold mb-2 text-white">Konservasi Aktif</h3>
-                  <p className="text-xs text-white/70 leading-relaxed">
+                  <p className="text-xs text-white/60 leading-relaxed">
                     Sebagian hasil perjalanan dialokasikan untuk program konservasi laut.
                   </p>
                 </div>

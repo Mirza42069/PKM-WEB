@@ -5,6 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 function Navbar() {
   const pathname = usePathname()
@@ -29,7 +30,7 @@ function Navbar() {
           )}>Marleen</span>
         </Link>
         
-        <nav className="flex items-center gap-8">
+        <nav className="flex items-center gap-6">
           <Link 
             href="/" 
             className={cn(
@@ -51,6 +52,15 @@ function Navbar() {
             )}
           >
             Jelajahi
+          </Link>
+          <Link href="/subscribe">
+            <Button 
+              size="sm" 
+              variant={isHomePage ? "secondary" : "default"}
+              className="text-xs"
+            >
+              Langganan
+            </Button>
           </Link>
         </nav>
       </div>

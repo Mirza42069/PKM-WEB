@@ -111,10 +111,15 @@ function formatPrice(price: number) {
   }).format(price)
 }
 
+function calculatePlusPrice(price: number) {
+  return Math.round(price * 0.9)
+}
+
 export default function ExplorePage() {
   const [activeCategory, setActiveCategory] = React.useState("all")
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedListing, setSelectedListing] = React.useState<number | null>(null)
+  const [showPlusPrice, setShowPlusPrice] = React.useState(false)
 
   // Filter listings based on category and search query
   const filteredListings = listings.filter((listing) => {
@@ -136,31 +141,45 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       <main className="flex-1">
         {/* Header */}
-        <section className="border-b py-10">
+        <section className="border-b py-12">
           <div className="container mx-auto px-4">
-            <p className="text-xs text-muted-foreground mb-2 tracking-wide uppercase">
+            <p className="text-xs text-muted-foreground mb-2 tracking-widest uppercase font-mono">
               Katalog
             </p>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
               Jelajahi Destinasi
             </h1>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-sm text-muted-foreground mb-8 max-w-md">
               Temukan pengalaman ekowisata bahari dengan operator tersertifikasi
             </p>
             
             {/* Search & Filter */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input 
-                placeholder="Cari destinasi atau operator..." 
-                className="max-w-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative max-w-sm flex-1">
+                <Input 
+                  placeholder="Cari destinasi atau operator…" 
+                  className="pl-4 pr-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Cari destinasi atau operator"
+                  name="search"
+                  autoComplete="off"
+                />
+                <svg 
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
               <div className="flex gap-2 flex-wrap">
                 {categories.map((cat) => (
                   <Button
@@ -168,6 +187,11 @@ export default function ExplorePage() {
                     variant={activeCategory === cat.value ? "default" : "outline"}
                     size="sm"
                     onClick={() => setActiveCategory(cat.value)}
+                    className={`transition-colors duration-200 ${
+                      activeCategory === cat.value 
+                        ? "ring-2 ring-primary/20 ring-offset-2 ring-offset-background" 
+                        : "hover:bg-accent"
+                    }`}
                   >
                     {cat.name}
                   </Button>
@@ -180,18 +204,40 @@ export default function ExplorePage() {
         {/* Listings */}
         <section className="py-10">
           <div className="container mx-auto px-4">
-            <p className="text-xs text-muted-foreground mb-6">
-              Menampilkan <span className="font-medium text-foreground">{filteredListings.length}</span> hasil
-              {activeCategory !== "all" && (
-                <span> untuk kategori <span className="font-medium text-foreground">{categories.find(c => c.value === activeCategory)?.name}</span></span>
-              )}
-              {searchQuery && (
-                <span> dengan pencarian "<span className="font-medium text-foreground">{searchQuery}</span>"</span>
-              )}
-            </p>
+            {/* Results count with Marleen Plus toggle */}
+            <div className="flex items-center justify-between mb-8">
+              <p className="text-xs text-muted-foreground">
+                Menampilkan <span className="font-medium text-foreground">{filteredListings.length}</span> hasil
+                {activeCategory !== "all" && (
+                  <span> untuk kategori <span className="font-medium text-foreground">{categories.find(c => c.value === activeCategory)?.name}</span></span>
+                )}
+                {searchQuery && (
+                  <span> dengan pencarian &ldquo;<span className="font-medium text-foreground">{searchQuery}</span>&rdquo;</span>
+                )}
+              </p>
+              
+              <Button
+                variant={showPlusPrice ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowPlusPrice(!showPlusPrice)}
+                className="transition-colors duration-200"
+              >
+                {showPlusPrice && (
+                  <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                Marleen Plus
+              </Button>
+            </div>
             
             {filteredListings.length === 0 ? (
-              <div className="text-center py-12">
+              <div className="text-center py-16">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent flex items-center justify-center">
+                  <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">
                   Tidak ada destinasi yang cocok dengan filter Anda.
                 </p>
@@ -207,9 +253,12 @@ export default function ExplorePage() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredListings.map((listing) => (
-                  <Card key={listing.id} className="group flex flex-col">
+                  <Card 
+                    key={listing.id} 
+                    className="group flex flex-col transition-shadow transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+                  >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between mb-2">
                         <span className="text-xs text-muted-foreground font-mono">
@@ -221,7 +270,7 @@ export default function ExplorePage() {
                           </Badge>
                         )}
                       </div>
-                      <CardTitle className="text-sm font-semibold leading-snug">
+                      <CardTitle className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors">
                         {listing.title}
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -233,7 +282,7 @@ export default function ExplorePage() {
                       <div className="space-y-2 text-xs text-muted-foreground">
                         <div className="flex justify-between">
                           <span>Lokasi</span>
-                          <span className="text-foreground">{listing.location}</span>
+                          <span className="text-foreground text-right max-w-[60%]">{listing.location}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Durasi</span>
@@ -254,26 +303,49 @@ export default function ExplorePage() {
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-muted-foreground">Estimasi Karbon</span>
                           <span className="text-xs font-mono text-secondary font-medium">
-                            ~{listing.carbonKg} kg CO2
+                            ~{listing.carbonKg}&nbsp;kg CO2
                           </span>
                         </div>
                       </div>
                     </CardContent>
                     
-                    <CardFooter className="flex items-center justify-between pt-3 border-t mt-auto">
-                      <div>
-                        <p className="text-sm font-semibold text-primary">
-                          {formatPrice(listing.price)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">per orang</p>
+                    <CardFooter className="flex flex-col gap-3 pt-3 border-t mt-auto">
+                      {/* Price Section */}
+                      <div className="w-full flex items-center justify-between">
+                        <div>
+                          {showPlusPrice ? (
+                            <>
+                              <p className="text-xs line-through text-muted-foreground">
+                                {formatPrice(listing.price)}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold text-primary">
+                                  {formatPrice(calculatePlusPrice(listing.price))}
+                                </p>
+                                <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded font-medium">
+                                  10% off
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">per orang</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-sm font-semibold text-foreground">
+                                {formatPrice(listing.price)}
+                              </p>
+                              <p className="text-xs text-muted-foreground">per orang</p>
+                            </>
+                          )}
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDetailClick(listing.id)}
+                          className="transition-colors duration-200 hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                        >
+                          Detail
+                        </Button>
                       </div>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleDetailClick(listing.id)}
-                      >
-                        Detail
-                      </Button>
                     </CardFooter>
                   </Card>
                 ))}
