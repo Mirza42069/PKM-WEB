@@ -1,168 +1,82 @@
 # AGENTS.md - Guidelines for AI Coding Agents
 
-This repository contains a Next.js 16 application (in `/marleen`) with React 19, TypeScript 5, and Tailwind CSS 4.
+## Project Context
+**Name**: Marleen (PKM-PAPER)
+**Stack**: Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4
+**Location**: `C:\dev\PKM-PAPER\marleen web` (All commands run from here)
 
-## Project Structure
-
-```
-PKM-PAPER/
-├── marleen/          # Next.js application
-│   ├── app/          # App Router pages and layouts
-│   ├── components/   # React components
-│   │   └── ui/       # shadcn/ui components (base-mira style)
-│   ├── lib/          # Utility functions
-│   └── public/       # Static assets
-└── graphics/         # Project graphics/images
-```
-
-## Build, Lint, and Test Commands
-
-All commands run from the `marleen/` directory:
-
+## Build, Lint, & Test
 ```bash
 bun install          # Install dependencies
-bun run dev          # Development server
+bun run dev          # Start development server
 bun run build        # Production build
-bun run start        # Start production server
-bun run lint         # Lint codebase (or: bun eslint .)
+bun run lint         # Lint codebase (eslint)
 bunx tsc --noEmit    # Type checking
+# Tests: No framework configured. If needed, suggest Vitest or Playwright.
 ```
 
-**No test framework configured.** If tests are needed, use Vitest (unit) or Playwright (E2E).
+## Code Style & Conventions
 
-## Code Style Guidelines
+### TypeScript & React
+- **Strict Mode**: All code must pass strict checks.
+- **Components**: Functional components, PascalCase naming (`Navbar.tsx`).
+- **Props**: Use `React.ComponentProps<"element">` for extension.
+- **Types**: Prefer `type` over `interface`.
+- **Imports**: Group order: React/Next -> Third-party -> Internal (`@/components`, `@/lib`).
+- **Exports**: Named exports for components (`export { Navbar }`).
+- **Directives**: Use `"use client"` only when interactive state/hooks are needed.
 
-### TypeScript
-- **Strict mode enabled** - All code must pass strict TypeScript checks
-- Target: ES2017, Module resolution: Bundler
-- Use `React.ComponentProps<"element">` for extending HTML element props
-- Prefer `type` over `interface` for object types
+### Styling (Tailwind CSS 4)
+- **Theme**: Warm orange primary, teal secondary, off-white cream background.
+- **Fonts**: Geist Mono (monospace aesthetic).
+- **Utility**: Use `cn()` for class merging. `cva` for component variants.
+- **Tokens**: Use semantic colors (`text-foreground`, `bg-background`).
+- **No Emojis**: Use `@hugeicons/react` icons instead.
 
-```typescript
-function Button({ className, ...props }: React.ComponentProps<"button">) { ... }
-function Card({ size = "default", ...props }: React.ComponentProps<"div"> & { size?: "default" | "sm" }) { ... }
-```
+## Web Interface Guidelines (Strict Compliance)
 
-### Imports (order with blank lines between groups)
-1. React/framework imports (`next/*`, `react`)
-2. Third-party libraries (`@base-ui/*`, `class-variance-authority`)
-3. Internal aliases (`@/components/*`, `@/lib/*`)
+### Accessibility & Focus
+- **Labels**: All form controls need `<label>` or `aria-label`. Icon-only buttons MUST have `aria-label`.
+- **Focus**: Visible focus states (`focus-visible:ring-*`). Never `outline: none` without replacement.
+- **Structure**: Hierarchical headings (`h1`-`h6`). Semantic HTML first (`<button>`, `<a>`).
+- **Updates**: Async updates use `aria-live="polite"`.
 
-```typescript
-import * as React from "react"
-import Link from "next/link"
+### Forms
+- **Attributes**: Inputs need `autocomplete`, `name`, and correct `type` (`email`, `tel`).
+- **Behavior**: Never block paste. Submit enabled until request starts. Errors inline.
+- **Safety**: `autocomplete="off"` for non-auth fields. Warn on unsaved changes.
 
-import { cva, type VariantProps } from "class-variance-authority"
+### Animation & Interaction
+- **Perf**: Animate `transform`/`opacity` only. Honor `prefers-reduced-motion`.
+- **Feedback**: Buttons need `hover:` states. Interactive states must increase contrast.
+- **Touch**: `touch-action: manipulation` to prevent zoom delay. Min target size 44px.
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-```
+### Performance & Images
+- **Images**: `<img>` needs explicit `width`/`height`. Below-fold `loading="lazy"`.
+- **Lists**: Virtualize large lists (>50 items).
+- **Render**: No layout reads (`offsetWidth`) during render. Batch DOM operations.
 
-### Path Aliases
-- `@/components/*` - React components
-- `@/components/ui/*` - shadcn/ui components
-- `@/lib/*` - Utility functions
-- `@/hooks/*` - Custom React hooks
+### Navigation & State
+- **URL**: Filters, tabs, pagination must reflect in URL query params.
+- **Links**: Use `<a>` or `<Link>` for navigation (never `div onClick`).
+- **Destructive**: Require confirmation modal or undo action.
 
-### Component Patterns
-- Use function declarations (not arrow functions)
-- Export named components for UI components
-- Use `"use client"` directive only when needed
-- Add `data-slot` attributes to root elements
+### Content & Typography
+- **Format**: Use curly quotes (“”). Non-breaking spaces for units (`10&nbsp;MB`).
+- **Loading**: "Loading…" (ellipsis character, not three dots).
+- **Copy**: Title Case headings. Active voice ("Install CLI"). Numerals for counts ("8 items").
+- **Truncation**: Handle long content (`truncate`, `line-clamp`). Handle empty states gracefully.
 
-```typescript
-"use client"
-function Navbar() {
-  return <header data-slot="navbar" className="...">{/* content */}</header>
-}
-export { Navbar }
-```
+### Anti-patterns (Do Not Use)
+- `transition: all` (list properties explicitly)
+- `user-scalable=no` (never disable zoom)
+- `autoFocus` on mobile
+- Hardcoded date/number formats (use `Intl`)
+- Array `.map()` on large lists without virtualization
+- `suppressHydrationWarning` without valid reason
 
-### Styling
-- **Tailwind CSS 4** with CSS variables for theming
-- **Typography**: Monospace font (Geist Mono) throughout - enterprise minimal aesthetic
-- **Colors**: Warm orange primary, teal secondary, off-white cream background
-- Use `cn()` from `@/lib/utils` for conditional class merging
-- Use `cva` for component variants
-- Semantic color tokens: `text-foreground`, `bg-background`, `text-muted-foreground`
-- **No emojis** in UI - use hugeicons or text-based indicators instead
-
-```typescript
-const buttonVariants = cva("base-classes", {
-  variants: {
-    variant: { default: "...", outline: "..." },
-    size: { default: "...", sm: "...", lg: "..." },
-  },
-  defaultVariants: { variant: "default", size: "default" },
-})
-```
-
-### Naming Conventions
-| Type | Convention | Example |
-|------|------------|---------|
-| Components | PascalCase | `Navbar`, `CardHeader` |
-| Files (UI) | kebab-case | `alert-dialog.tsx` |
-| Functions/vars | camelCase | `formatPrice`, `buttonVariants` |
-| CSS variables | kebab-case | `--primary-foreground` |
-
-### Component Library
-- **shadcn/ui** with **base-mira** style
-- Icon library: **hugeicons** (`@hugeicons/react`)
-- Add components: `bunx shadcn@latest add <component>`
-
-### Error Handling
-- Use TypeScript's strict null checks
-- Prefer early returns for validation
-- Use optional chaining (`?.`) and nullish coalescing (`??`)
-
-### File Organization
-- One component per file (except related sub-components)
-- Group related exports at file bottom
-- Keep page components focused on layout composition
-
-### JSX Formatting
-- Double quotes for attributes
-- Self-close empty elements
-- Extract complex logic into variables
-
-```tsx
-const services = [{ title: "...", price: "..." }]
-{services.map((service) => <Card key={service.title}>...</Card>)}
-```
-
-### ESLint Configuration
-Uses ESLint 9 with `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`.
-Ignored: `.next/`, `out/`, `build/`, `next-env.d.ts`
-
-## Key Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `next` (16.x) | React framework with App Router |
-| `react` (19.x) | UI library |
-| `tailwindcss` (4.x) | Utility-first CSS |
-| `@base-ui/react` | Base component primitives |
-| `class-variance-authority` | Component variant management |
-| `clsx` + `tailwind-merge` | Class name utilities |
-| `@hugeicons/react` | Icon library |
-
-## Common Patterns
-
-### Page Structure
-```tsx
-export default function PageName() {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
-        <section className="container mx-auto px-4 py-12">{/* content */}</section>
-      </main>
-    </div>
-  )
-}
-```
-
-### Adding shadcn Components
-```bash
-cd marleen && bunx shadcn@latest add button card input
-```
+## Directory Structure
+- `/app`: App Router pages
+- `/components/ui`: shadcn/ui components (kebab-case files)
+- `/lib`: Utilities (`utils.ts` for `cn`)
+- `/public`: Static assets
